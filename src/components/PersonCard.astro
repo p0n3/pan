@@ -1,0 +1,48 @@
+---
+import type { Person, Group } from '../types';
+import { calculateAge, getDaysUntilBirthday } from '../utils/ageCalculator';
+
+export interface Props {
+  person: Person;
+  group: Group;
+}
+
+const { person, group } = Astro.props;
+const age = calculateAge(person.birthDate);
+const daysUntilBirthday = getDaysUntilBirthday(person.birthDate);
+---
+
+<div 
+  class="bg-white rounded-xl shadow-sm border-l-4 p-4 hover:shadow-md transition-shadow duration-200"
+  style={`border-left-color: ${group.color}`}
+>
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="text-lg font-semibold text-gray-900">{person.name}</h3>
+    <span 
+      class="px-2 py-1 text-xs font-medium rounded-full text-white"
+      style={`background-color: ${group.color}`}
+    >
+      {group.name}
+    </span>
+  </div>
+  
+  <div class="space-y-2">
+    <div class="flex items-center justify-between">
+      <span class="text-gray-600">Age:</span>
+      <span class="text-xl font-bold text-gray-900">{age.formatted}</span>
+    </div>
+    
+    <div class="flex items-center justify-between text-sm">
+      <span class="text-gray-500">Birthday in:</span>
+      <span class="text-gray-700 font-medium">
+        {daysUntilBirthday === 0 ? 'Today! 🎉' : 
+         daysUntilBirthday === 1 ? 'Tomorrow!' : 
+         `${daysUntilBirthday} days`}
+      </span>
+    </div>
+    
+    <div class="text-xs text-gray-400 pt-1 border-t">
+      Born: {new Date(person.birthDate).toLocaleDateString()}
+    </div>
+  </div>
+</div>

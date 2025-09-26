@@ -1,0 +1,364 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PersonCard from '../components/PersonCard.astro';
+import AddPersonModal from '../components/AddPersonModal.astro';
+import ManageGroupsModal from '../components/ManageGroupsModal.astro';
+---
+
+<Layout title="Tage - Family & Friends Ages">
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+              <span class="text-white font-bold text-lg">T</span>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Tage</h1>
+              <p class="text-sm text-gray-600">Track ages & birthdays</p>
+            </div>
+          </div>
+          
+          <div class="flex space-x-2">
+            <button 
+              id="add-person-btn"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span class="hidden sm:inline">Add Person</span>
+            </button>
+            
+            <button 
+              id="manage-groups-btn"
+              class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <span class="hidden sm:inline">Groups</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center">
+            <div class="p-2 bg-blue-100 rounded-lg">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Total People</p>
+              <p id="total-people" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center">
+            <div class="p-2 bg-green-100 rounded-lg">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Upcoming Birthdays</p>
+              <p id="upcoming-birthdays" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex items-center">
+            <div class="p-2 bg-purple-100 rounded-lg">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-600">Groups</p>
+              <p id="total-groups" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- People Grid -->
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Everyone</h2>
+        <div id="people-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- People cards will be inserted here by JavaScript -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-12">
+          <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No people added yet</h3>
+          <p class="text-gray-600 mb-6">Start by adding your family members and friends to track their ages and birthdays.</p>
+          <button id="empty-add-person" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
+            Add Your First Person
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <AddPersonModal />
+  <ManageGroupsModal />
+</Layout>
+
+<script>
+  import { storage } from '../utils/localStorage';
+  import { initializeMockData } from '../utils/mockData';
+  import { calculateAge, getDaysUntilBirthday } from '../utils/ageCalculator';
+  import type { Person, Group } from '../types';
+
+  // Initialize the app
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeMockData();
+    loadAndRenderData();
+    setupEventListeners();
+  });
+
+  function setupEventListeners() {
+    // Add person modal
+    const addPersonBtn = document.getElementById('add-person-btn');
+    const emptyAddPersonBtn = document.getElementById('empty-add-person');
+    const addPersonModal = document.getElementById('add-person-modal');
+    const closeAddPersonModal = document.getElementById('close-add-person-modal');
+    const cancelAddPerson = document.getElementById('cancel-add-person');
+    const addPersonForm = document.getElementById('add-person-form') as HTMLFormElement;
+
+    const showAddPersonModal = () => {
+      populateGroupOptions();
+      addPersonModal?.classList.remove('hidden');
+    };
+
+    const hideAddPersonModal = () => {
+      addPersonModal?.classList.add('hidden');
+    };
+
+    addPersonBtn?.addEventListener('click', showAddPersonModal);
+    emptyAddPersonBtn?.addEventListener('click', showAddPersonModal);
+    closeAddPersonModal?.addEventListener('click', hideAddPersonModal);
+    cancelAddPerson?.addEventListener('click', hideAddPersonModal);
+
+    addPersonForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(addPersonForm);
+      const person: Person = {
+        id: Date.now().toString(),
+        name: formData.get('name') as string,
+        birthDate: formData.get('birthDate') as string,
+        groupId: formData.get('groupId') as string
+      };
+      
+      storage.addPerson(person);
+      loadAndRenderData();
+      hideAddPersonModal();
+      addPersonForm.reset();
+    });
+
+    // Manage groups modal
+    const manageGroupsBtn = document.getElementById('manage-groups-btn');
+    const manageGroupsModal = document.getElementById('manage-groups-modal');
+    const closeManageGroupsModal = document.getElementById('close-manage-groups-modal');
+    const addGroupForm = document.getElementById('add-group-form') as HTMLFormElement;
+
+    manageGroupsBtn?.addEventListener('click', () => {
+      loadGroupsInModal();
+      manageGroupsModal?.classList.remove('hidden');
+    });
+
+    closeManageGroupsModal?.addEventListener('click', () => {
+      manageGroupsModal?.classList.add('hidden');
+    });
+
+    addGroupForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(addGroupForm);
+      const group: Group = {
+        id: Date.now().toString(),
+        name: formData.get('name') as string,
+        color: formData.get('color') as string
+      };
+      
+      storage.addGroup(group);
+      loadGroupsInModal();
+      addGroupForm.reset();
+      loadAndRenderData();
+    });
+
+    // Color picker sync
+    const colorPicker = document.getElementById('group-color') as HTMLInputElement;
+    const colorText = document.getElementById('group-color-text') as HTMLInputElement;
+
+    colorPicker?.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      colorText.value = target.value;
+    });
+
+    colorText?.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (/^#[0-9A-F]{6}$/i.test(target.value)) {
+        colorPicker.value = target.value;
+      }
+    });
+
+    // Close modals on outside click
+    addPersonModal?.addEventListener('click', (e) => {
+      if (e.target === addPersonModal) {
+        hideAddPersonModal();
+      }
+    });
+
+    manageGroupsModal?.addEventListener('click', (e) => {
+      if (e.target === manageGroupsModal) {
+        manageGroupsModal.classList.add('hidden');
+      }
+    });
+  }
+
+  function loadAndRenderData() {
+    const people = storage.getPeople();
+    const groups = storage.getGroups();
+    
+    updateStats(people, groups);
+    renderPeople(people, groups);
+  }
+
+  function updateStats(people: Person[], groups: Group[]) {
+    const totalPeopleEl = document.getElementById('total-people');
+    const upcomingBirthdaysEl = document.getElementById('upcoming-birthdays');
+    const totalGroupsEl = document.getElementById('total-groups');
+
+    if (totalPeopleEl) totalPeopleEl.textContent = people.length.toString();
+    if (totalGroupsEl) totalGroupsEl.textContent = groups.length.toString();
+
+    // Count upcoming birthdays (next 30 days)
+    const upcomingCount = people.filter(person => {
+      const days = getDaysUntilBirthday(person.birthDate);
+      return days <= 30;
+    }).length;
+
+    if (upcomingBirthdaysEl) upcomingBirthdaysEl.textContent = upcomingCount.toString();
+  }
+
+  function renderPeople(people: Person[], groups: Group[]) {
+    const peopleGrid = document.getElementById('people-grid');
+    const emptyState = document.getElementById('empty-state');
+
+    if (!peopleGrid || !emptyState) return;
+
+    if (people.length === 0) {
+      peopleGrid.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+
+    // Sort people by upcoming birthdays
+    const sortedPeople = [...people].sort((a, b) => {
+      return getDaysUntilBirthday(a.birthDate) - getDaysUntilBirthday(b.birthDate);
+    });
+
+    peopleGrid.innerHTML = sortedPeople.map(person => {
+      const group = groups.find(g => g.id === person.groupId);
+      if (!group) return '';
+
+      const age = calculateAge(person.birthDate);
+      const daysUntilBirthday = getDaysUntilBirthday(person.birthDate);
+
+      return `
+        <div 
+          class="bg-white rounded-xl shadow-sm border-l-4 p-4 hover:shadow-md transition-shadow duration-200"
+          style="border-left-color: ${group.color}"
+        >
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-lg font-semibold text-gray-900">${person.name}</h3>
+            <span 
+              class="px-2 py-1 text-xs font-medium rounded-full text-white"
+              style="background-color: ${group.color}"
+            >
+              ${group.name}
+            </span>
+          </div>
+          
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-600">Age:</span>
+              <span class="text-xl font-bold text-gray-900">${age.formatted}</span>
+            </div>
+            
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-gray-500">Birthday in:</span>
+              <span class="text-gray-700 font-medium">
+                ${daysUntilBirthday === 0 ? 'Today! 🎉' : 
+                  daysUntilBirthday === 1 ? 'Tomorrow!' : 
+                  `${daysUntilBirthday} days`}
+              </span>
+            </div>
+            
+            <div class="text-xs text-gray-400 pt-1 border-t">
+              Born: ${new Date(person.birthDate).toLocaleDateString()}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function populateGroupOptions() {
+    const groupSelect = document.getElementById('person-group') as HTMLSelectElement;
+    if (!groupSelect) return;
+
+    const groups = storage.getGroups();
+    groupSelect.innerHTML = '<option value="">Select a group</option>' + 
+      groups.map(group => `<option value="${group.id}">${group.name}</option>`).join('');
+  }
+
+  function loadGroupsInModal() {
+    const groupsList = document.getElementById('groups-list');
+    if (!groupsList) return;
+
+    const groups = storage.getGroups();
+    groupsList.innerHTML = groups.map(group => `
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div class="flex items-center space-x-3">
+          <div class="w-4 h-4 rounded-full" style="background-color: ${group.color}"></div>
+          <span class="font-medium text-gray-900">${group.name}</span>
+        </div>
+        <button 
+          onclick="deleteGroup('${group.id}')"
+          class="text-red-600 hover:text-red-800 text-sm font-medium"
+        >
+          Delete
+        </button>
+      </div>
+    `).join('');
+  }
+
+  // Make deleteGroup available globally
+  (window as any).deleteGroup = function(groupId: string) {
+    if (confirm('Are you sure you want to delete this group?')) {
+      storage.deleteGroup(groupId);
+      loadGroupsInModal();
+      loadAndRenderData();
+    }
+  };
+</script>
