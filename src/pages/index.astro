@@ -95,7 +95,23 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
 
       <!-- People Grid -->
       <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Everyone</h2>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-3 sm:space-y-0">
+          <h2 class="text-xl font-semibold text-gray-900">Everyone</h2>
+          <div class="flex items-center space-x-2">
+            <label for="sort-select" class="text-sm font-medium text-gray-600 hidden sm:inline">Sort by:</label>
+            <select 
+              id="sort-select" 
+              class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-0 flex-1 sm:flex-initial"
+            >
+              <option value="birthday-asc">🎂 Upcoming Birthdays</option>
+              <option value="age-desc">👴 Oldest First</option>
+              <option value="age-asc">👶 Youngest First</option>
+              <option value="name-asc">🔤 Alphabetical (A-Z)</option>
+              <option value="name-desc">🔤 Alphabetical (Z-A)</option>
+              <option value="group">👥 By Group</option>
+            </select>
+          </div>
+        </div>
         <div id="people-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- People cards will be inserted here by JavaScript -->
         </div>
@@ -135,6 +151,12 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
   });
 
   function setupEventListeners() {
+    // Sort dropdown
+    const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+    sortSelect?.addEventListener('change', () => {
+      loadAndRenderData();
+    });
+
     // Add person modal
     const addPersonBtn = document.getElementById('add-person-btn');
     const emptyAddPersonBtn = document.getElementById('empty-add-person');
@@ -261,6 +283,7 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
   function renderPeople(people: Person[], groups: Group[]) {
     const peopleGrid = document.getElementById('people-grid');
     const emptyState = document.getElementById('empty-state');
+    const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
 
     if (!peopleGrid || !emptyState) return;
 
@@ -272,10 +295,9 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
 
     emptyState.classList.add('hidden');
 
-    // Sort people by upcoming birthdays
-    const sortedPeople = [...people].sort((a, b) => {
-      return getDaysUntilBirthday(a.birthDate) - getDaysUntilBirthday(b.birthDate);
-    });
+    // Sort people based on selected option
+    const sortValue = sortSelect?.value || 'birthday-asc';
+    const sortedPeople = sortPeople([...people], groups, sortValue);
 
     peopleGrid.innerHTML = sortedPeople.map(person => {
       const group = groups.find(g => g.id === person.groupId);
@@ -286,17 +308,28 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
 
       return `
         <div 
-          class="bg-white rounded-xl shadow-sm border-l-4 p-4 hover:shadow-md transition-shadow duration-200"
+          class="bg-white rounded-xl shadow-sm border-l-4 p-4 hover:shadow-md transition-shadow duration-200 relative"
           style="border-left-color: ${group.color}"
         >
           <div class="flex items-center justify-between mb-2">
             <h3 class="text-lg font-semibold text-gray-900">${person.name}</h3>
-            <span 
-              class="px-2 py-1 text-xs font-medium rounded-full text-white"
-              style="background-color: ${group.color}"
-            >
-              ${group.name}
-            </span>
+            <div class="flex items-center space-x-2">
+              <span 
+                class="px-2 py-1 text-xs font-medium rounded-full text-white"
+                style="background-color: ${group.color}"
+              >
+                ${group.name}
+              </span>
+              <button 
+                onclick="deletePerson('${person.id}')"
+                class="text-gray-400 hover:text-red-600 transition-colors duration-200 p-1"
+                title="Delete ${person.name}"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </div>
           </div>
           
           <div class="space-y-2">
@@ -353,11 +386,61 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     `).join('');
   }
 
+  function sortPeople(people: Person[], groups: Group[], sortValue: string): Person[] {
+    switch (sortValue) {
+      case 'birthday-asc':
+        return people.sort((a, b) => getDaysUntilBirthday(a.birthDate) - getDaysUntilBirthday(b.birthDate));
+      
+      case 'age-desc': // Oldest first
+        return people.sort((a, b) => {
+          const ageA = calculateAge(a.birthDate);
+          const ageB = calculateAge(b.birthDate);
+          return ageB.value - ageA.value;
+        });
+      
+      case 'age-asc': // Youngest first
+        return people.sort((a, b) => {
+          const ageA = calculateAge(a.birthDate);
+          const ageB = calculateAge(b.birthDate);
+          return ageA.value - ageB.value;
+        });
+      
+      case 'name-asc': // A-Z
+        return people.sort((a, b) => a.name.localeCompare(b.name));
+      
+      case 'name-desc': // Z-A
+        return people.sort((a, b) => b.name.localeCompare(a.name));
+      
+      case 'group': // By group, then by name
+        return people.sort((a, b) => {
+          const groupA = groups.find(g => g.id === a.groupId)?.name || '';
+          const groupB = groups.find(g => g.id === b.groupId)?.name || '';
+          if (groupA !== groupB) {
+            return groupA.localeCompare(groupB);
+          }
+          return a.name.localeCompare(b.name);
+        });
+      
+      default:
+        return people;
+    }
+  }
+
   // Make deleteGroup available globally
   (window as any).deleteGroup = function(groupId: string) {
     if (confirm('Are you sure you want to delete this group?')) {
       storage.deleteGroup(groupId);
       loadGroupsInModal();
+      loadAndRenderData();
+    }
+  };
+
+  // Make deletePerson available globally
+  (window as any).deletePerson = function(personId: string) {
+    const people = storage.getPeople();
+    const person = people.find(p => p.id === personId);
+    if (person && confirm(`Are you sure you want to delete ${person.name}?`)) {
+      storage.deletePerson(personId);
       loadAndRenderData();
     }
   };

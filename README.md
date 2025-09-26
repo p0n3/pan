@@ -19,11 +19,24 @@ A modern, responsive web application built with Astro and TypeScript that helps 
   - Organize people into custom groups (Family, Friends, Work, Kids, etc.)
   - Assign colors to groups for visual organization
   - Easy group creation and management
+  - Delete groups when no longer needed
+
+- **Person Management**:
+  - Add people with name, birth date, and group assignment
+  - Delete people with confirmation dialog
+  - Easy-to-use delete buttons on each person card
 
 - **Modern Design**: 
   - Beautiful, responsive interface that works on all devices
   - Mobile-first design optimized for smartphones
   - Clean, intuitive user experience
+
+- **Flexible Sorting**: 
+  - Sort by upcoming birthdays (default)
+  - Sort by age (oldest first or youngest first)
+  - Sort alphabetically (A-Z or Z-A)
+  - Sort by group with secondary name sorting
+  - Emoji icons for easy identification on mobile
 
 - **Local Storage**: 
   - All data stored locally in your browser
@@ -79,6 +92,16 @@ The app is fully responsive and optimized for mobile devices:
 1. Click the "Add Person" button in the header
 2. Fill in the person's name, birth date, and select a group
 3. Click "Add Person" to save
+
+### Managing People
+
+- **Delete Person**: Click the trash icon on any person card to delete them (with confirmation)
+- **Sort People**: Use the sort dropdown to organize the list by:
+  - 🎂 Upcoming Birthdays (default)
+  - 👴 Oldest First
+  - 👶 Youngest First  
+  - 🔤 Alphabetical (A-Z or Z-A)
+  - 👥 By Group
 
 ### Managing Groups
 
