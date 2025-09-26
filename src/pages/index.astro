@@ -48,51 +48,6 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-blue-100 rounded-lg">
-              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Total People</p>
-              <p id="total-people" class="text-2xl font-bold text-gray-900">0</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-green-100 rounded-lg">
-              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Upcoming Birthdays</p>
-              <p id="upcoming-birthdays" class="text-2xl font-bold text-gray-900">0</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-purple-100 rounded-lg">
-              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-              </svg>
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600">Groups</p>
-              <p id="total-groups" class="text-2xl font-bold text-gray-900">0</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- People Grid -->
       <div class="mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-3 sm:space-y-0">
@@ -259,25 +214,7 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     const people = storage.getPeople();
     const groups = storage.getGroups();
     
-    updateStats(people, groups);
     renderPeople(people, groups);
-  }
-
-  function updateStats(people: Person[], groups: Group[]) {
-    const totalPeopleEl = document.getElementById('total-people');
-    const upcomingBirthdaysEl = document.getElementById('upcoming-birthdays');
-    const totalGroupsEl = document.getElementById('total-groups');
-
-    if (totalPeopleEl) totalPeopleEl.textContent = people.length.toString();
-    if (totalGroupsEl) totalGroupsEl.textContent = groups.length.toString();
-
-    // Count upcoming birthdays (next 30 days)
-    const upcomingCount = people.filter(person => {
-      const days = getDaysUntilBirthday(person.birthDate);
-      return days <= 30;
-    }).length;
-
-    if (upcomingBirthdaysEl) upcomingBirthdaysEl.textContent = upcomingCount.toString();
   }
 
   function renderPeople(people: Person[], groups: Group[]) {

@@ -13,7 +13,7 @@ A modern, responsive web application built with Astro and TypeScript that helps 
 - **Birthday Tracking**: 
   - See how many days until each person's birthday
   - Special indicators for today's birthdays and tomorrow's
-  - Dashboard showing upcoming birthdays (next 30 days)
+  - Clean, focused view of all your people
 
 - **Group Management**: 
   - Organize people into custom groups (Family, Friends, Work, Kids, etc.)
@@ -111,12 +111,13 @@ The app is fully responsive and optimized for mobile devices:
 
 ### Viewing Ages
 
-- The main dashboard shows all people sorted by upcoming birthdays
+- The main view shows all people with your preferred sorting
 - Each card displays:
   - Person's name and group
   - Current age in the most appropriate format
   - Days until their next birthday
   - Birth date
+  - Delete button for easy management
 
 ## 🎨 Customization
 
