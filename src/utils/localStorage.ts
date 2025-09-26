@@ -2,7 +2,8 @@ import type { Person, Group } from '../types';
 
 const STORAGE_KEYS = {
   PEOPLE: 'tage-people',
-  GROUPS: 'tage-groups'
+  GROUPS: 'tage-groups',
+  SORT_PREFERENCE: 'tage-sort-preference'
 } as const;
 
 export const storage = {
@@ -68,5 +69,16 @@ export const storage = {
   deleteGroup(id: string): void {
     const groups = this.getGroups().filter(g => g.id !== id);
     this.saveGroups(groups);
+  },
+
+  // Sort preference operations
+  getSortPreference(): string {
+    if (typeof window === 'undefined') return 'birthday-asc';
+    return localStorage.getItem(STORAGE_KEYS.SORT_PREFERENCE) || 'birthday-asc';
+  },
+
+  setSortPreference(sortValue: string): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(STORAGE_KEYS.SORT_PREFERENCE, sortValue);
   }
 };

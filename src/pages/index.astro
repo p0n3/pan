@@ -101,6 +101,7 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
   // Initialize the app
   document.addEventListener('DOMContentLoaded', () => {
     initializeMockData();
+    loadSortPreference();
     loadAndRenderData();
     setupEventListeners();
   });
@@ -109,6 +110,7 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     // Sort dropdown
     const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
     sortSelect?.addEventListener('change', () => {
+      storage.setSortPreference(sortSelect.value);
       loadAndRenderData();
     });
 
@@ -217,10 +219,17 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     renderPeople(people, groups);
   }
 
+  function loadSortPreference() {
+    const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+    if (sortSelect) {
+      const savedPreference = storage.getSortPreference();
+      sortSelect.value = savedPreference;
+    }
+  }
+
   function renderPeople(people: Person[], groups: Group[]) {
     const peopleGrid = document.getElementById('people-grid');
     const emptyState = document.getElementById('empty-state');
-    const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
 
     if (!peopleGrid || !emptyState) return;
 
@@ -232,8 +241,8 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
 
     emptyState.classList.add('hidden');
 
-    // Sort people based on selected option
-    const sortValue = sortSelect?.value || 'birthday-asc';
+    // Sort people based on saved preference
+    const sortValue = storage.getSortPreference();
     const sortedPeople = sortPeople([...people], groups, sortValue);
 
     peopleGrid.innerHTML = sortedPeople.map(person => {

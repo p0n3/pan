@@ -42,6 +42,7 @@ A modern, responsive web application built with Astro and TypeScript that helps 
   - All data stored locally in your browser
   - No server required - works offline
   - Privacy-focused - your data stays on your device
+  - Remembers your preferred sort order between sessions
 
 ## 🚀 Getting Started
 
@@ -102,6 +103,7 @@ The app is fully responsive and optimized for mobile devices:
   - 👶 Youngest First  
   - 🔤 Alphabetical (A-Z or Z-A)
   - 👥 By Group
+  - Your sort preference is automatically saved and restored
 
 ### Managing Groups
 
