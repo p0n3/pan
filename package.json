@@ -4,7 +4,11 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "dev:demo": "cross-env VITE_DATA_MODE=demo astro dev",
+    "dev:api": "cross-env VITE_DATA_MODE=production VITE_API_URL=http://localhost:3001/api astro dev",
+    "build": "cross-env BUILD_MODE=demo astro build",
+    "build:demo": "cross-env BUILD_MODE=demo astro build",
+    "build:production": "cross-env BUILD_MODE=production astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -12,5 +16,8 @@
     "@tailwindcss/vite": "^4.1.13",
     "astro": "^5.14.1",
     "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }

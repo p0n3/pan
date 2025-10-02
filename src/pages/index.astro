@@ -93,25 +93,34 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
 </Layout>
 
 <script>
-  import { storage } from '../utils/localStorage';
+  import { initializeDataService, getDataService } from '../utils/dataService';
+  import { dataConfig } from '../config/dataConfig';
   import { initializeMockData } from '../utils/mockData';
   import { calculateAge, getDaysUntilBirthday } from '../utils/ageCalculator';
   import type { Person, Group } from '../types';
 
   // Initialize the app
-  document.addEventListener('DOMContentLoaded', () => {
-    initializeMockData();
-    loadSortPreference();
-    loadAndRenderData();
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize data service based on configuration
+    initializeDataService(dataConfig);
+    
+    // Initialize mock data only in demo mode
+    if (dataConfig.mode === 'demo') {
+      initializeMockData();
+    }
+    
+    await loadSortPreference();
+    await loadAndRenderData();
     setupEventListeners();
   });
 
   function setupEventListeners() {
     // Sort dropdown
     const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
-    sortSelect?.addEventListener('change', () => {
-      storage.setSortPreference(sortSelect.value);
-      loadAndRenderData();
+    sortSelect?.addEventListener('change', async () => {
+      const dataService = getDataService();
+      await dataService.setSortPreference(sortSelect.value);
+      await loadAndRenderData();
     });
 
     // Add person modal
@@ -122,8 +131,8 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     const cancelAddPerson = document.getElementById('cancel-add-person');
     const addPersonForm = document.getElementById('add-person-form') as HTMLFormElement;
 
-    const showAddPersonModal = () => {
-      populateGroupOptions();
+    const showAddPersonModal = async () => {
+      await populateGroupOptions();
       addPersonModal?.classList.remove('hidden');
     };
 
@@ -136,18 +145,18 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     closeAddPersonModal?.addEventListener('click', hideAddPersonModal);
     cancelAddPerson?.addEventListener('click', hideAddPersonModal);
 
-    addPersonForm?.addEventListener('submit', (e) => {
+    addPersonForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(addPersonForm);
-      const person: Person = {
-        id: Date.now().toString(),
+      const person = {
         name: formData.get('name') as string,
         birthDate: formData.get('birthDate') as string,
         groupId: formData.get('groupId') as string
       };
       
-      storage.addPerson(person);
-      loadAndRenderData();
+      const dataService = getDataService();
+      await dataService.addPerson(person);
+      await loadAndRenderData();
       hideAddPersonModal();
       addPersonForm.reset();
     });
@@ -158,8 +167,8 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     const closeManageGroupsModal = document.getElementById('close-manage-groups-modal');
     const addGroupForm = document.getElementById('add-group-form') as HTMLFormElement;
 
-    manageGroupsBtn?.addEventListener('click', () => {
-      loadGroupsInModal();
+    manageGroupsBtn?.addEventListener('click', async () => {
+      await loadGroupsInModal();
       manageGroupsModal?.classList.remove('hidden');
     });
 
@@ -167,19 +176,19 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
       manageGroupsModal?.classList.add('hidden');
     });
 
-    addGroupForm?.addEventListener('submit', (e) => {
+    addGroupForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(addGroupForm);
-      const group: Group = {
-        id: Date.now().toString(),
+      const group = {
         name: formData.get('name') as string,
         color: formData.get('color') as string
       };
       
-      storage.addGroup(group);
-      loadGroupsInModal();
+      const dataService = getDataService();
+      await dataService.addGroup(group);
+      await loadGroupsInModal();
       addGroupForm.reset();
-      loadAndRenderData();
+      await loadAndRenderData();
     });
 
     // Color picker sync
@@ -212,22 +221,24 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     });
   }
 
-  function loadAndRenderData() {
-    const people = storage.getPeople();
-    const groups = storage.getGroups();
+  async function loadAndRenderData() {
+    const dataService = getDataService();
+    const people = await dataService.getPeople();
+    const groups = await dataService.getGroups();
     
-    renderPeople(people, groups);
+    await renderPeople(people, groups);
   }
 
-  function loadSortPreference() {
+  async function loadSortPreference() {
     const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
     if (sortSelect) {
-      const savedPreference = storage.getSortPreference();
+      const dataService = getDataService();
+      const savedPreference = await dataService.getSortPreference();
       sortSelect.value = savedPreference;
     }
   }
 
-  function renderPeople(people: Person[], groups: Group[]) {
+  async function renderPeople(people: Person[], groups: Group[]) {
     const peopleGrid = document.getElementById('people-grid');
     const emptyState = document.getElementById('empty-state');
 
@@ -242,7 +253,8 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     emptyState.classList.add('hidden');
 
     // Sort people based on saved preference
-    const sortValue = storage.getSortPreference();
+    const dataService = getDataService();
+    const sortValue = await dataService.getSortPreference();
     const sortedPeople = sortPeople([...people], groups, sortValue);
 
     peopleGrid.innerHTML = sortedPeople.map(person => {
@@ -302,20 +314,22 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
     }).join('');
   }
 
-  function populateGroupOptions() {
+  async function populateGroupOptions() {
     const groupSelect = document.getElementById('person-group') as HTMLSelectElement;
     if (!groupSelect) return;
 
-    const groups = storage.getGroups();
+    const dataService = getDataService();
+    const groups = await dataService.getGroups();
     groupSelect.innerHTML = '<option value="">Select a group</option>' + 
       groups.map(group => `<option value="${group.id}">${group.name}</option>`).join('');
   }
 
-  function loadGroupsInModal() {
+  async function loadGroupsInModal() {
     const groupsList = document.getElementById('groups-list');
     if (!groupsList) return;
 
-    const groups = storage.getGroups();
+    const dataService = getDataService();
+    const groups = await dataService.getGroups();
     groupsList.innerHTML = groups.map(group => `
       <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
         <div class="flex items-center space-x-3">
@@ -373,21 +387,23 @@ import ManageGroupsModal from '../components/ManageGroupsModal.astro';
   }
 
   // Make deleteGroup available globally
-  (window as any).deleteGroup = function(groupId: string) {
+  (window as any).deleteGroup = async function(groupId: string) {
     if (confirm('Are you sure you want to delete this group?')) {
-      storage.deleteGroup(groupId);
-      loadGroupsInModal();
-      loadAndRenderData();
+      const dataService = getDataService();
+      await dataService.deleteGroup(groupId);
+      await loadGroupsInModal();
+      await loadAndRenderData();
     }
   };
 
   // Make deletePerson available globally
-  (window as any).deletePerson = function(personId: string) {
-    const people = storage.getPeople();
+  (window as any).deletePerson = async function(personId: string) {
+    const dataService = getDataService();
+    const people = await dataService.getPeople();
     const person = people.find(p => p.id === personId);
     if (person && confirm(`Are you sure you want to delete ${person.name}?`)) {
-      storage.deletePerson(personId);
-      loadAndRenderData();
+      await dataService.deletePerson(personId);
+      await loadAndRenderData();
     }
   };
 </script>

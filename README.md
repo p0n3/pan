@@ -38,10 +38,10 @@ A modern, responsive web application built with Astro and TypeScript that helps 
   - Sort by group with secondary name sorting
   - Emoji icons for easy identification on mobile
 
-- **Local Storage**: 
-  - All data stored locally in your browser
-  - No server required - works offline
-  - Privacy-focused - your data stays on your device
+- **Flexible Data Storage**: 
+  - **Demo Mode**: All data stored locally in your browser (no server required)
+  - **Production Mode**: Connect to your own REST API for data persistence
+  - Privacy-focused - your data stays where you choose
   - Remembers your preferred sort order between sessions
 
 ## 🚀 Getting Started
@@ -65,8 +65,17 @@ npm install
 ```
 
 3. Start the development server:
+
+**For demo mode (localStorage):**
 ```bash
 npm run dev
+# or explicitly
+npm run dev:demo
+```
+
+**For API mode (requires running API server):**
+```bash
+npm run dev:api
 ```
 
 4. Open your browser and navigate to `http://localhost:4321`
@@ -151,8 +160,17 @@ interface Group {
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
+**Development:**
+- `npm run dev` - Start development server (demo mode)
+- `npm run dev:demo` - Start development server in demo mode (localStorage)
+- `npm run dev:api` - Start development server in API mode (requires API server)
+
+**Building:**
+- `npm run build` - Build for production (demo mode by default)
+- `npm run build:demo` - Build demo version (localStorage only)
+- `npm run build:production` - Build production version (API mode)
+
+**Other:**
 - `npm run preview` - Preview production build
 
 ### Project Structure
@@ -166,6 +184,37 @@ src/
 ├── utils/              # Utility functions
 └── styles/             # Global styles
 ```
+
+## ⚙️ API Configuration
+
+When building for production mode, you need to provide the API URL:
+
+### Environment Variables
+
+- `BUILD_MODE` - Set to `demo` or `production`
+- `API_URL` - Base URL for your REST API (required for production mode)
+
+### Production Build with API
+
+```bash
+# Set environment variables and build
+BUILD_MODE=production API_URL=https://your-api.com/api npm run build:production
+```
+
+### Expected API Endpoints
+
+Your REST API should implement these endpoints:
+
+- `GET /people` - Get all people
+- `POST /people` - Create a new person
+- `PUT /people/:id` - Update a person
+- `DELETE /people/:id` - Delete a person
+- `GET /groups` - Get all groups
+- `POST /groups` - Create a new group
+- `PUT /groups/:id` - Update a group
+- `DELETE /groups/:id` - Delete a group
+- `GET /preferences/sort` - Get sort preference
+- `PUT /preferences/sort` - Update sort preference
 
 ## 🚀 Deployment
 
