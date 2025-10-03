@@ -8,7 +8,7 @@
     "dev:api": "cross-env VITE_DATA_MODE=production VITE_API_URL=http://localhost:3001/api astro dev",
     "build": "cross-env BUILD_MODE=demo astro build",
     "build:demo": "cross-env BUILD_MODE=demo astro build",
-    "build:production": "cross-env BUILD_MODE=production astro build",
+    "build:production": "cross-env BUILD_MODE=production API_URL=http://127.0.0.1:8090/api astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
