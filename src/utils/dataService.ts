@@ -67,8 +67,8 @@ class LocalStorageDataService implements DataServiceInterface {
 class ApiDataService implements DataServiceInterface {
   private apiService: ApiService;
 
-  constructor(apiService: ApiService) {
-    this.apiService = apiService;
+  constructor(apiUrl: string) {
+    this.apiService = new ApiService(apiUrl);
   }
 
   async getPeople(): Promise<Person[]> {
@@ -126,21 +126,13 @@ class ApiDataService implements DataServiceInterface {
 export interface DataServiceConfig {
   mode: 'demo' | 'production';
   apiUrl?: string;
-  apiHeaders?: Record<string, string>;
 }
 
 export function createDataService(config: DataServiceConfig): DataServiceInterface {
   if (config.mode === 'demo') {
     return new LocalStorageDataService();
   } else {
-    if (!config.apiUrl) {
-      throw new Error('API URL is required for production mode');
-    }
-    const apiService = new ApiService({
-      baseUrl: config.apiUrl,
-      headers: config.apiHeaders,
-    });
-    return new ApiDataService(apiService);
+    return new ApiDataService(config.apiUrl || '');
   }
 }
 
